@@ -112,3 +112,7 @@ go build -o customer-service
 ##授权码生成
 curl -H "Content-Type: application/json" -X POST -d '{"appId": "***.com","issuedTime": 1669082100,"notBefore": 1669082100,"notAfter": 1669116589,"customerInfo": "***公司","authorization": "all,training,inference","machineCodes": ["JL32YL2"],"nodeNum":1}' "http://localhost:2999/v1/createLicence"
 ```
+
+### 特别鸣谢
+
+本框架基于字节开源的hertz、kitex框架进行扩展，感谢字节机构大力支持：https://github.com/cloudwego。
