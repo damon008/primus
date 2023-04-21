@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/app/middlewares/client/sd"
+	//"github.com/cloudwego/hertz/pkg/app/middlewares/client/sd"
 	"github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"primus/consumer-cli/hello/hello_service"
-	"primus/pkg/nacos"
-	nacoscli "github.com/hertz-contrib/registry/nacos"
+	//"primus/pkg/nacos"
+	//nacoscli "github.com/hertz-contrib/registry/nacos"
 	"time"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	//r := nacoscli.NewNacosResolver(cc)
 
 	cli, _ := hello_service.NewHelloServiceClient(
-		"http://hello-service",
+		"http://customer-service",
 		//"http://127.0.0.1:9809",
 		//hello_service.WithHertzClientMiddleware(), // 指定 client 的中间件
 	)
