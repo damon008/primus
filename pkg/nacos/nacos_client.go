@@ -1,7 +1,6 @@
 package nacos
 
 import (
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/registry/nacos/common"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
@@ -10,17 +9,21 @@ import (
 	"os"
 )
 
-func NewNacosConfig(ip string) (naming_client.INamingClient, error) {
-	hlog.Debugf("connect Nacos start")
+func NewNacosConfig(ip string, port int32) (naming_client.INamingClient, error) {
 	sc := []constant.ServerConfig{
 		//*constant.NewServerConfig(os.Getenv("serverAddr"), uint64(NacosPort())),
-		*constant.NewServerConfig(ip, uint64(8848)),
+		*constant.NewServerConfig(ip, uint64(port)),
 	}
 	cc := constant.ClientConfig {
 		NamespaceId:         os.Getenv("namespace"),
 		RegionId:            "cn-hangzhou",
 		CustomLogger:        common.NewCustomNacosLogger(),
 		NotLoadCacheAtStart: true,
+		LogDir:              "/data/nacos/log",
+		CacheDir:            "/data/nacos/cache",
+		LogLevel:            "info",
+		//Username:            "your-name",
+		//Password:            "your-password",
 	}
 	client, err := clients.NewNamingClient(
 		vo.NacosClientParam{
@@ -32,6 +35,35 @@ func NewNacosConfig(ip string) (naming_client.INamingClient, error) {
 		return nil, err
 	}
 	return client, nil
+}
+
+func InitNacos(ip string, port uint64) (naming_client.INamingClient, error) {
+	sc := []constant.ServerConfig{
+		*constant.NewServerConfig(ip, port),
+	}
+
+	cc := constant.ClientConfig {
+		NamespaceId:         "public",
+		TimeoutMs:           5000,
+		NotLoadCacheAtStart: true,
+		LogDir:              "/data/nacos/log",
+		CacheDir:            "/data/nacos/cache",
+		LogLevel:            "info",
+		//Username:            "your-name",
+		//Password:            "your-password",
+	}
+
+	cli, err := clients.NewNamingClient(
+		vo.NacosClientParam {
+			ClientConfig:  &cc,
+			ServerConfigs: sc,
+		},
+	)
+	if err != nil {
+		panic(err)
+		return nil, err
+	}
+	return cli,err
 }
 
 /*func NacosPort() int64 {

@@ -14,9 +14,8 @@ struct Request {
 }
 
 struct Msg {
-	1: i64 status
-	2: i64 code
-	3: string msg
+	1: i32 code
+	2: string msg
 }
 
 struct Response {
@@ -27,6 +26,7 @@ struct Response {
 service HelloService {
     Response echo(1: Request req)
     Response Get()
+    Response GetByParams(1: string data, 2: string msg)(api.get="/api/v1/getByParams/:data")
     Response GetH(1: i32 id)(api.get="/api/v1/getH/:id")
     Response Post(1: Request req)(api.post="/api/v1/create")
 }

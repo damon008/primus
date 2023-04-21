@@ -72,15 +72,13 @@ cd hello-server
 ...
 
 #code server for hertz
-#不需要编解码代码加参数-t=template=slim
-hz new -module demo-service -idl =../idl/user.proto -t=template=slim
-hz new -module system-service --idl =../idl/order.thrift -t=template=slim
-
-#hertz client 
-hz client --idl=../idl/auth.thrift --model_dir=hz_gen -t=template=slim --client_dir=user_cli
-hz client --idl=../idl/order.thrift --model_dir=hz_gen -t=template=slim --client_dir=order_cli
-
-hz client --mod=a/b/c --idl=../idl/psm.thrift --model_dir=model --client_dir=hertz_client -t=template=slim
+#不需要编解码代码加参数-t=template=slim，pb文件同理
+cd customer-service
+hz new -module customer-service --idl=../idl/hello.thrift -t=template=slim
+hz update --idl=../idl/hello.thrift
+#hertz client
+cd consumer-cli
+hz client --mod=primus/consumer-cli --idl=../idl/hello.thrift --model_dir=model -t=template=slim --client_dir=hello
 ```
 
 ### 构建
