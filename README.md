@@ -58,6 +58,15 @@
 Kitex 在使用 Thrift 作为 Payload 的情况下，性能优于官方 gRPC，吞吐接近 gRPC 的两倍；
 此外，在 Kitex 使用定制的 Protobuf 协议时，性能也优于 gRPC。
 
+### 项目结构
+
+- hello-server 此为kitex server端demo
+- customer-service 此为kitex cli端demo，同时又是hertz server端demo
+- consumer-cli 此为hertz cli端demo，同时又是hertz server端demo
+- idl 此为项目代码生成的idl文件所在，thrift、pb文件
+- kitex_gen 此为根据idl的文件生成的kitex所需要使用到的中间件，便于kitex cli和server端互通
+- pkg 此为所有的依赖包、函数、工具等资源池
+
 ### 代码生成
 
 ```shell
@@ -84,14 +93,8 @@ hz client --mod=primus/consumer-cli --idl=../idl/hello.thrift --model_dir=model 
 ### 构建
 
 ```
-cd primus
-
-cd client/customer-service
+cd primus/customer-service
 go build -o customer-service
-
-cd ../../server/hello
-go build -o hello
-
 ```
 
 ## License Scene
