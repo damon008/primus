@@ -61,7 +61,7 @@ Kitex 在使用 Thrift 作为 Payload 的情况下，性能优于官方 gRPC，�
 ### 项目结构
 
 - hello-server 此为kitex server端demo
-- customer-service 此为kitex cli端demo，同时又是hertz server端demo
+- producer-service 此为kitex cli端demo，同时又是hertz server端demo
 - consumer-cli 此为hertz cli端demo，同时又是hertz server端demo
 - idl 此为项目代码生成的idl文件所在，thrift、pb文件
 - kitex_gen 此为根据idl的文件生成的kitex所需要使用到的中间件，便于kitex cli和server端互通
@@ -82,8 +82,8 @@ cd hello-server
 
 #code server for hertz
 #不需要编解码代码加参数-t=template=slim，pb文件同理
-cd customer-service
-hz new -module customer-service --idl=../idl/hello.thrift -t=template=slim
+cd producer-service
+hz new -module producer-service --idl=../idl/hello.thrift -t=template=slim
 hz update --idl=../idl/hello.thrift
 #hertz client
 cd consumer-cli
@@ -93,8 +93,8 @@ hz client --mod=primus/consumer-cli --idl=../idl/hello.thrift --model_dir=model 
 ### 构建
 
 ```
-cd primus/customer-service
-go build -o customer-service
+cd primus/producer-service
+go build -o producer-service
 ```
 
 ## License Scene

@@ -18,7 +18,7 @@ func main() {
 	//r := nacoscli.NewNacosResolver(cc)
 
 	cli, _ := hello_service.NewHelloServiceClient(
-		"http://customer-service",
+		"http://producer-service",
 		//"http://127.0.0.1:9809",
 		//hello_service.WithHertzClientMiddleware(), // 指定 client 的中间件
 	)

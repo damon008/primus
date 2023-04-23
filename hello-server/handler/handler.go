@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"primus/kitex_gen/hello"
 )
 
@@ -24,7 +26,15 @@ func (s *HelloServiceImpl) Get(ctx context.Context) (resp *hello.Response, err e
 // GetH implements the HelloServiceImpl interface.
 func (s *HelloServiceImpl) GetH(ctx context.Context, id int32) (resp *hello.Response, err error) {
 	// TODO: Your code here...
-	return
+	klog.Info("param: ", id)
+	
+	return &hello.Response{
+		Msg:  &hello.Msg{
+			Code:   0,
+			Msg:    "success",
+		},
+		Data: fmt.Sprintf("result is: %d", id),
+	}, nil
 }
 
 // Post implements the HelloServiceImpl interface.

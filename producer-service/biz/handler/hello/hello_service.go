@@ -7,7 +7,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	hello "primus/customer-service/biz/model/hello"
+	hello "primus/producer-service/biz/model/hello"
+	"primus/producer-service/biz/rpc"
+	"strconv"
 )
 
 // GetByParams .
@@ -39,8 +41,12 @@ func GetH(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}*/
-
-	resp := new(hello.Response)
+	i,_ := strconv.Atoi(id)
+	resp,err :=rpc.GetH(ctx, int32(i))
+	if err !=nil {
+		hlog.Error("failed: ", err)
+		c.JSON(consts.StatusInternalServerError, resp)
+	}
 	resp.Data = id
 	c.JSON(consts.StatusOK, resp)
 }

@@ -3,7 +3,7 @@
 package router
 
 import (
-	hello "primus/customer-service/biz/router/hello"
+	hello "primus/producer-service/biz/router/hello"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

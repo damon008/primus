@@ -7,10 +7,10 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"hz-kitex-examples/pkg/constants"
-	"hz-kitex-examples/pkg/errno"
-	"hz-kitex-examples/pkg/res"
-	"hz-kitex-examples/pkg/util"
+	"primus/pkg/constants"
+	"primus/pkg/errno"
+	"primus/pkg/res"
+	"primus/pkg/util/singleton"
 	"net/http"
 )
 
@@ -27,8 +27,8 @@ type IssuedContent struct {
 
 func LicenceChecker() {
 	hlog.Debug("软件授权系统自检")
-	//var licenseFile = "D:\\study\\hz-kitex-examples\\pkg\\license\\LICENSE"
-	var licenseFile = "/Users/damon/program/study/go/hz-kitex-examples/pkg/license/LICENSE"
+	var licenseFile = "D:\\study\\primus\\pkg\\license\\LICENSE"
+	//var licenseFile = "/Users/damon/program/study/go/primus/pkg/license/LICENSE"
 	byteLicence, err := VerifyLicence(licenseFile)
 	if err != nil {
 		hlog.Error("verify the licence error", err)
@@ -91,24 +91,28 @@ func LicenceChecker() {
 func LicenceIssued() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		func(ctx context.Context, c *app.RequestContext) {
-			resp, err := util.NewHTTPClient().Get("http://localhost:2999/v1/checkLicence")
+			//resp, err := util.NewHTTPClient().Get("http://localhost:2999/v1/checkLicence")
+			resp, err := singleton.Get("http://localhost:2999/v1/checkLicence", "")
 			if err != nil {
 				hlog.Error("request the licence check api fail: ", err)
 				c.Header("Copyright-Software", "unauthorized")
 				c.AbortWithStatus(http.StatusBadGateway)
 				return
 			}
+			hlog.Info(string(resp.Body()))
 			licenceContent := res.DefaultResponse{}
-			hlog.Info(string(resp.Data))
-			err = sonic.Unmarshal(resp.Data, &licenceContent)
+			err = sonic.Unmarshal(resp.Body(), &licenceContent)
 			//拿到授权状态再进行判断
-			if resp.Status != 200 || err != nil || licenceContent.Msg.Code != 0 {
+			//hlog.Info(licenceContent.Msg.Msg)
+			//hlog.Info(licenceContent.Msg.Code)
+			//hlog.Info(licenceContent.Data)
+			if resp.StatusCode() != 200 || err != nil || licenceContent.Msg.Code != 0 {
 				// Credentials doesn't match, we return 401 and abort handlers chain.
 				c.Header("Copyright-Software", "unauthorized")
 				c.AbortWithStatus(http.StatusBadGateway)
 				return
 			} else {
-				hlog.Debug(licenceContent.Data)
+				hlog.Debug(licenceContent)
 			}
 		},
 	}

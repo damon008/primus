@@ -34,11 +34,10 @@ type HelloServiceClient struct {
 
 func NewHelloServiceClient(hostUrl string, ops ...Option) (Client, error) {
 	cc, _ := nacos.NewNacosConfig("121.37.173.206", 8848)
-	r := nacoscli.NewNacosResolver(cc)
 
 	opts := getOptions(append(ops, withHostUrl(hostUrl))...)
 	cli, err := newClient(opts)
-	cli.Use(sd.Discovery(r))
+	cli.Use(sd.Discovery(nacoscli.NewNacosResolver(cc)))
 	if err != nil {
 		return nil, err
 	}

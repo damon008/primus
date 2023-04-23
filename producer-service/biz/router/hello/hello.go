@@ -4,7 +4,7 @@ package hello
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
-	hello "primus/customer-service/biz/handler/hello"
+	hello "primus/producer-service/biz/handler/hello"
 )
 
 /*
