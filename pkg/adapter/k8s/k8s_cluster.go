@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"hz-kitex-examples/pkg/constants"
+	"primus/pkg/constants"
 	"strings"
 )
 

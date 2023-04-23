@@ -27,11 +27,11 @@ type IssuedContent struct {
 
 func LicenceChecker() {
 	hlog.Debug("软件授权系统自检")
-	var licenseFile = "D:\\study\\primus\\pkg\\license\\LICENSE"
+	var licenseFile = "E:\\study\\primus\\pkg\\license\\LICENSE"
 	//var licenseFile = "/Users/damon/program/study/go/primus/pkg/license/LICENSE"
 	byteLicence, err := VerifyLicence(licenseFile)
 	if err != nil {
-		hlog.Error("verify the licence error", err)
+		hlog.Error("verify the licence error: ", err)
 		constants.LicenceState = errno.NewErrNo(-1, "false")
 		//constants.LicenceState = errno.ConvertErr(err)
 		return

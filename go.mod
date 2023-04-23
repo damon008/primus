@@ -38,7 +38,9 @@ require (
 	gorm.io/plugin/opentracing v0.0.0-20211220013347-7d2b2af23560
 	k8s.io/apimachinery v0.27.1
 	k8s.io/client-go v0.27.1
-	volcano.sh/apis v1.19.6
+	volcano.sh/apis v1.7.0
+//volcano.sh/apis v1.19.6
+//volcano.sh/apis v0.0.0-20210603070204-70005b2d502a
 )
 
 require (
@@ -90,6 +92,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
+	github.com/moby/term v0.0.0-20221205130635-1aeaba878587 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
@@ -136,6 +139,7 @@ require (
 	gopkg.in/ini.v1 v1.42.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gotest.tools/v3 v3.4.0 // indirect
 	k8s.io/klog/v2 v2.90.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230308215209-15aac26d736a // indirect
 	k8s.io/utils v0.0.0-20230209194617-a36077c30491 // indirect

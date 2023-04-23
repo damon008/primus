@@ -2,7 +2,7 @@ package license
 
 import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"hz-kitex-examples/pkg/adapter/k8s"
+	"primus/pkg/adapter/k8s"
 )
 
 func GetClusterNodes() (int, error) {
