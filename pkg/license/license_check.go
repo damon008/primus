@@ -7,11 +7,11 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"net/http"
 	"primus/pkg/constants"
 	"primus/pkg/errno"
 	"primus/pkg/res"
 	"primus/pkg/util/singleton"
-	"net/http"
 )
 
 type IssuedContent struct {
@@ -27,8 +27,8 @@ type IssuedContent struct {
 
 func LicenceChecker() {
 	hlog.Debug("软件授权系统自检")
-	var licenseFile = "E:\\study\\primus\\pkg\\license\\LICENSE"
-	//var licenseFile = "/Users/damon/program/study/go/primus/pkg/license/LICENSE"
+	//var licenseFile = "E:\\study\\primus\\pkg\\license\\LICENSE"
+	var licenseFile = "/Users/damon/program/study/go/primus/pkg/license/LICENSE"
 	byteLicence, err := VerifyLicence(licenseFile)
 	if err != nil {
 		hlog.Error("verify the licence error: ", err)
@@ -92,7 +92,7 @@ func LicenceIssued() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		func(ctx context.Context, c *app.RequestContext) {
 			//resp, err := util.NewHTTPClient().Get("http://localhost:2999/v1/checkLicence")
-			resp, err := singleton.Get("http://localhost:2999/v1/checkLicence", "")
+			resp, err := singleton.Get("http://localhost:10000/v1/checkLicence", "")
 			if err != nil {
 				hlog.Error("request the licence check api fail: ", err)
 				c.Header("Copyright-Software", "unauthorized")

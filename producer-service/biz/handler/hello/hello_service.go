@@ -33,7 +33,7 @@ func GetByParams(ctx context.Context, c *app.RequestContext) {
 func GetH(ctx context.Context, c *app.RequestContext) {
 	//var err error
 	//var req int32
-	hlog.Info("app: ", c)
+	//hlog.Info("app: ", c)
 	id := c.Param("id")
 	hlog.Info("id: ", id)
 	/*err = c.BindAndValidate(&req)
@@ -41,13 +41,12 @@ func GetH(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}*/
-	i,_ := strconv.Atoi(id)
-	resp,err :=rpc.GetH(ctx, int32(i))
-	if err !=nil {
+	i, _ := strconv.Atoi(id)
+	resp, err := rpc.GetH(ctx, int32(i))
+	if err != nil {
 		hlog.Error("failed: ", err)
 		c.JSON(consts.StatusInternalServerError, resp)
 	}
-	resp.Data = id
 	c.JSON(consts.StatusOK, resp)
 }
 

@@ -10,6 +10,7 @@ import (
 	"primus/pkg/license"
 	nacosCli "primus/pkg/nacos"
 	"primus/pkg/util"
+	"primus/pkg/util/singleton"
 	"time"
 
 	//"github.com/cloudwego/hertz/pkg/app/middlewares/client/sd"
@@ -19,11 +20,12 @@ import (
 )
 
 func main() {
-	conf,err := nacosCli.NewNacosConfig("121.37.173.206", 8848)
+	conf, err := nacosCli.NewNacosConfig("121.37.173.206", 8848)
 	if err != nil {
 		hlog.Error(err)
 	}
 
+	singleton.GetHttpCli()
 
 	stop := make(chan struct{})
 	//服务启动后会检测5分钟检测一次软件授权，第一次看授权,全局变量
@@ -41,4 +43,3 @@ func main() {
 	router.Init(h)
 	h.Spin()
 }
-

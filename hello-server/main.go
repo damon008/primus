@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/kitex/pkg/remote/codec"
 	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
@@ -23,13 +24,15 @@ func main() {
 	svr := hello.NewServer(
 		new(handler.HelloServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: constants.HelloServiceName}),
-		server.WithServiceAddr(&net.TCPAddr {
+		server.WithServiceAddr(&net.TCPAddr{
 			Port: 1000,
 		}),
 		//server.WithListener(),
 		server.WithRegistry(registry.NewNacosRegistry(conf)),
 
-		server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FastRead | thrift.FastWrite)),
+		server.WithCodec(codec.NewDefaultCodecWithSizeLimit(1024*1024*10)),
+
+		server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
 		//连接多路复用(mux)，GRPC默认多路复用
 		server.WithMuxTransport(),
 		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),

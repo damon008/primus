@@ -5,6 +5,7 @@ package helloservice
 import (
 	"context"
 	client "github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/klog"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
 	hello "primus/kitex_gen/hello"
 )
@@ -142,8 +143,10 @@ func (p *kClient) Get(ctx context.Context) (r *hello.Response, err error) {
 func (p *kClient) GetH(ctx context.Context, id int32) (r *hello.Response, err error) {
 	var _args hello.HelloServiceGetHArgs
 	_args.Id = id
+	klog.Info("kitex_gen service id: ", id)
 	var _result hello.HelloServiceGetHResult
 	if err = p.c.Call(ctx, "GetH", &_args, &_result); err != nil {
+		klog.Error("call failed: ", err)
 		return
 	}
 	return _result.GetSuccess(), nil
