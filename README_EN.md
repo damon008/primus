@@ -45,15 +45,11 @@ Currently in China, the GPL agreement has contractual characteristics and is a c
 
 
 ### Stress Test Conclusion
-Under normal requests, Kitex-mux performs the best, followed by Kitex. It is recommended to use Thrift encoding and decoding first.
-
-Under the GRPC protocol, Kitex performs the best and is stronger than native gRPC. It is recommended to use Thrift encoding and decoding first.
-
-Under Streaming, Kitex performs the best based on Protobuf encoding, with two options: Kitex Protobuf and gRPC.
-
-Under Thrift and Protobuf, Kitex-mux performs the best, followed by Kitex. It is recommended to use Thrift encoding and decoding first.
-
-When using Thrift as Payload, Kitex's performance exceeds that of official gRPC, with throughput close to twice that of gRPC; In addition, when Kitex uses customized Protobuf protocol, its performance is also better than gRPC.
+- Under normal requests, Kitex-mux performs the best, followed by Kitex. It is recommended to use Thrift encoding and decoding first.
+- Under the GRPC protocol, Kitex performs the best and is stronger than native gRPC. It is recommended to use Thrift encoding and decoding first.
+- Under Streaming, Kitex performs the best based on Protobuf encoding, with two options: Kitex Protobuf and gRPC.
+- Under Thrift and Protobuf, Kitex-mux performs the best, followed by Kitex. It is recommended to use Thrift encoding and decoding first.
+- When using Thrift as Payload, Kitex's performance exceeds that of official gRPC, with throughput close to twice that of gRPC; In addition, when Kitex uses customized Protobuf protocol, its performance is also better than gRPC.
 
 ### Project Structure
 
