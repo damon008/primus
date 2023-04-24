@@ -74,8 +74,8 @@ go install github.com/cloudwego/hertz/cmd/hz@latest
 go install github.com/cloudwego/kitex/tool/server/kitex@latest
 go install github.com/cloudwego/thriftgo@latest
 
-#kitex server
-kitex -module "primus" -thrift frugal_tag,template=slim -service hello idl/hello.thrift
+#kitex server 发现不太友好：去掉,template=slim
+kitex -module "primus" -thrift frugal_tag -service hello idl/hello.thrift
 mkdir hello-server
 cd hello-server
 ...

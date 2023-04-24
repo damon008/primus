@@ -2,29 +2,18 @@ package rpc
 
 import (
 	"context"
-	"github.com/bytedance/gopkg/cloud/circuitbreaker"
-	"github.com/bytedance/gopkg/lang/fastrand"
-	"github.com/cloudwego/kitex/pkg/circuitbreak"
-	"github.com/cloudwego/kitex/pkg/kerrors"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/loadbalance"
-	"github.com/cloudwego/kitex/pkg/remote"
-	"github.com/cloudwego/kitex/pkg/remote/codec"
 	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
+	"github.com/cloudwego/kitex/pkg/transmeta"
 
 	//"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
-	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/transport"
-	trace "github.com/kitex-contrib/tracer-opentracing"
 	api "primus/kitex_gen/hello"
 	hello "primus/kitex_gen/hello/helloservice"
-	//"primus/pkg/bound"
-	cb "primus/pkg/circuitbreak"
+
 	"primus/pkg/constants"
 	nacosCli "primus/pkg/nacos"
-	"strconv"
-
 	//"github.com/cloudwego/kitex/transport"
 	//"primus/pkg/failure"
 
@@ -45,7 +34,6 @@ import (
 	"time"
 
 	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/retry"
 	//dns "github.com/kitex-contrib/resolver-dns"
 )
 
@@ -61,132 +49,21 @@ func initHelloRpc() {
 
 	r1 := resolver.NewNacosResolver(conf)
 
-	lb := loadbalance.NewConsistBalancer(loadbalance.ConsistentHashOption{
-		GetKey: func(ctx context.Context, request interface{}) string {
-			return strconv.Itoa(fastrand.Intn(100000))
-		},
-		/*GetKey:  func(ctx context.Context, request interface{}) string {
-			key, _ := ctx.Value(ctxConsistentKey).(string)
-			if len(key) == 0 {
-				return "1234"
-			}
-			return key
-		},*/
-		// 是否使用 replica
-		// 如果使用，当请求失败（连接失败）后会依次尝试 replica
-		// 会带来额外内存和计算开销
-		// 如果不设置，那么请求失败（连接失败）后直接返回
-		Replica: 1,
-		// 虚拟节点数
-		// 每个真实节点对应的虚拟节点的数量
-		// 这个数值越大，内存和计算代价越大，负载越均衡
-		// 当节点数多时，可以适当设小一些；反之可以适当设大一些
-		// 推荐 VirtualFactor * Weight（如果 Weighted 为 true）的中位数在 1000 左右，负载应当已经很均衡了
-		// 推荐 总虚拟节点数 在 2000W 以内（1000W 情况之下 build 一次需要 250ms，不过为后台 build 理论上 3s 内均无问题）
-		VirtualFactor: 1000,
-		// 是否要遵循 Weight 进行负载均衡
-		// 如果为 false，对于每个 instance 都会忽略 Weight，均生成 VirtualFactor 个虚拟节点，进行无差别负载均衡
-		// 如果为 true，对于每个 instance 会生成 instance.Weight() * VirtualFactor 个虚拟节点
-		// 需要注意，对于 weight 为 0 的 instance，无论 VirtualFactor 为多少，均不会生成虚拟节点
-		// 建议设为 true，不过要注意适当调小 VirtualFactor
-		Weighted: true,
-		// 是否进行过期处理
-		// 实现会缓存所有的 Key
-		// 如果永不过期会导致内存一直增长
-		// 设置过期会导致额外性能开销
-		// 目前的实现是每分钟扫描删除一次，以及实例发生变动 rebuild 时删除一次
-		// 建议一定要设置，值不要小于一分钟
-		ExpireDuration: 5 * time.Minute,
-	})
-
-	// Use kitex client to make rpc calls and request back-end services
-
-	//异常重试：提高服务整体的成功率
-	//Backup Request：减少服务的延迟波动
-	fp := retry.NewFailurePolicy()
-	// 重试次数, 默认2，不包含首次请求
-	fp.WithMaxRetryTimes(2) // 合法值：[0-5]
-	// 总耗时，包括首次失败请求和重试请求耗时达到了限制的duration，则停止后续的重试。
-	fp.WithMaxDurationMS(8000)
-
-	// 关闭链路中止
-	fp.DisableChainRetryStop()
-
-	// 开启DDL中止
-	fp.WithDDLStop()
-
-	// 退避策略，默认无退避策略
-	fp.WithFixedBackOff(1000)         // 固定时长退避
-	fp.WithRandomBackOff(1000, 10000) // 随机时长退避
-
-	// 开启重试熔断
-	//fp.WithRetryBreaker(float64(1))
-	// 同一节点重试
-	//fp.WithRetrySameNode()
-
-	bp := retry.NewBackupPolicy(50)
-	bp.WithMaxRetryTimes(2)
-	// 关闭链路中止
-	bp.DisableChainRetryStop()
-
-	// 开启重试熔断
-	//bp.WithRetryBreaker(float64(1))
-
-	// 同一节点重试
-	//bp.WithRetrySameNode()
-
-	// TODO 熔断机制
-	opt := circuitbreaker.Options{
-		BucketTime:        0,
-		BucketNums:        0,
-		CoolingTimeout:    0,
-		DetectTimeout:     0,
-		HalfOpenSuccesses: 0,
-		//ShouldTrip:                circuitbreaker.ConsecutiveTripFunc(5),//连续错误数
-		ShouldTrip: circuitbreaker.RateTripFunc(0.5, 10), //错误率
-		//ShouldTrip:                circuitbreaker.ThresholdTripFunc(5),//错误数达到阈值
-		ShouldTripWithKey:         nil,
-		BreakerStateChangeHandler: nil,
-		EnableShardP:              false,
-		Now:                       nil,
-	}
-	cbPanel, err := circuitbreaker.NewPanel(cb.ChangeHandler, opt)
-	if err != nil {
-		klog.Error(err)
-	}
-	cbCtrl := circuitbreak.Control{GetKey: cb.GetKey, GetErrorType: cb.GetErrorType, DecorateError: cb.DecorateError}
-	cbMW := circuitbreak.NewCircuitBreakerMW(cbCtrl, cbPanel)
-
-	//cbs := circuitbreak.NewCBSuite(circuitbreak.GenServiceCBKeyFunc)
-
 	c, err := hello.NewClient(
 		constants.HelloServiceName,
 		//client.WithSuite(tracing.NewClientSuite()),
 		// Please keep the same as provider.WithServiceName
-		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: constants.ApiServiceName}),
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "producer-service"}),
 		//client.WithCircuitBreaker(cbs),
 		//client.WithMiddleware(cb.FailMW),
-		client.WithMiddleware(cbMW),
+		//client.WithMiddleware(cbMW),
 
 		//client.WithDialer(netpoll.NewDialer()),
 		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite|thrift.FastRead|thrift.FastWrite)),
-		client.WithLoadBalancer(lb),
+		//client.WithLoadBalancer(lb),
 
 		//client.WithTracer(prometheus.NewClientTracer(":9091", "/kitexHelloclient")),
 
-		client.WithErrorHandler(func(err error) error {
-			//for thrift、KitexProtobuf
-			if e, ok := err.(*remote.TransError); ok {
-				return e
-				//return e.TypeID()
-			}
-			//for gRPC
-			/*if s, ok := status.FromError(err); ok {
-				return s
-				//return s.Code(),s
-			}*/
-			return kerrors.ErrRemoteOrNetwork.WithCause(err)
-		}),
 		//client.WithLoadBalancer(loadbalance.NewWeightedBalancer()),
 		//指定这个服务的ip和端口
 		//client.withHostports(":8888"),
@@ -235,11 +112,11 @@ func initHelloRpc() {
 		//client.WithRPCTimeout(3 * time.Second),              // rpc timeout
 
 		//Thrift + TTHeader
-		client.WithTransportProtocol(transport.TTHeaderFramed),
+		client.WithTransportProtocol(transport.Framed),
 		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 
 		// 10 MB
-		client.WithCodec(codec.NewDefaultCodecWithSizeLimit(1024*1024*10)),
+		//client.WithCodec(codec.NewDefaultCodecWithSizeLimit(1024*1024*10)),
 
 		//client.WithLongConnection(
 		//	connpool.IdleConfig{MaxIdlePerAddress: 1000, MaxIdleGlobal: 1000, MaxIdleTimeout: time.Minute}),
@@ -249,15 +126,15 @@ func initHelloRpc() {
 		//这里的连接多路复用是针对于 Thrift 和 Kitex Protobuf，如果配置 gRPC 协议(client.WithTransportProtocol(transport.GRPC))，默认是连接多路复用。
 		//Client 开启连接多路复用，Server 必须也开启，否则会导致请求超时；Server 开启连接多路复用对 Client 没有限制，可以接受短连接、长连接池、连接多路复用的请求。
 		client.WithMuxConnection(2),
-		client.WithConnectTimeout(200*time.Millisecond), //20ms
+		client.WithConnectTimeout(2000*time.Millisecond), //20ms
 
-		client.WithFailureRetry(fp),
+		//client.WithFailureRetry(fp),
 		client.WithResolver(r1),
 		//client.WithResolver(dns.NewDNSResolver()),
 		//client.WithBackupRequest(bp),
 		//client.WithMiddleware(failure.NewFailureMW()),
 		//client.WithMiddleware(failure.NewDelayMW(60 * time.Millisecond)),//毫秒
-		client.WithSuite(trace.NewDefaultClientSuite()),
+		//client.WithSuite(trace.NewDefaultClientSuite()),
 		//client.WithBoundHandler(bound.NewCpuLimitHandler()),
 	)
 

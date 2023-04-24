@@ -10,9 +10,9 @@ import (
 // HelloServiceImpl implements the last service interface defined in the IDL.
 type HelloServiceImpl struct{}
 
-func (s *HelloServiceImpl) GetByParams(ctx context.Context, data string, msg string) (r *hello.Response, err error) {
-	//TODO implement me
-	panic("implement me")
+func (s *HelloServiceImpl) GetByParams(ctx context.Context, data string, msg string) (resp *hello.Response, err error) {
+	// TODO: Your code here...
+	return
 }
 
 // Echo implements the HelloServiceImpl interface.

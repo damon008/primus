@@ -14,14 +14,14 @@ func NewNacosConfig(ip string, port int32) (naming_client.INamingClient, error) 
 		//*constant.NewServerConfig(os.Getenv("serverAddr"), uint64(NacosPort())),
 		*constant.NewServerConfig(ip, uint64(port)),
 	}
-	cc := constant.ClientConfig {
+	cc := constant.ClientConfig{
 		NamespaceId:         os.Getenv("namespace"),
 		RegionId:            "cn-hangzhou",
 		CustomLogger:        common.NewCustomNacosLogger(),
 		NotLoadCacheAtStart: true,
 		LogDir:              "/data/nacos/log",
 		CacheDir:            "/data/nacos/cache",
-		LogLevel:            "info",
+		LogLevel:            "error",
 		//Username:            "your-name",
 		//Password:            "your-password",
 	}
@@ -42,7 +42,7 @@ func InitNacos(ip string, port uint64) (naming_client.INamingClient, error) {
 		*constant.NewServerConfig(ip, port),
 	}
 
-	cc := constant.ClientConfig {
+	cc := constant.ClientConfig{
 		NamespaceId:         "public",
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
@@ -54,7 +54,7 @@ func InitNacos(ip string, port uint64) (naming_client.INamingClient, error) {
 	}
 
 	cli, err := clients.NewNamingClient(
-		vo.NacosClientParam {
+		vo.NacosClientParam{
 			ClientConfig:  &cc,
 			ServerConfigs: sc,
 		},
@@ -63,7 +63,7 @@ func InitNacos(ip string, port uint64) (naming_client.INamingClient, error) {
 		panic(err)
 		return nil, err
 	}
-	return cli,err
+	return cli, err
 }
 
 /*func NacosPort() int64 {
