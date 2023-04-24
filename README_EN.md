@@ -4,7 +4,7 @@ Open source does not mean free of charge. This project is released under the GPL
 
 Currently in China, the GPL agreement has contractual characteristics and is a civil legal act, within the scope of China's "Contract Law". The original team of this project reserves all litigation rights.
 
-[Related Case: Violation of GPL Agreement Compensation 500,000, the First Case in China!]((https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA))
+[Related Case: Violation of GPL Agreement Compensation 500,000, the First Case in China!](https://mp.weixin.qq.com/s/YQ6sNjbDS-P7BViLZIsaoA)
 
 **PS:Our team has the final interpretation right of this open source agreement.**
 
