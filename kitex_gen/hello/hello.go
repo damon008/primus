@@ -93,30 +93,22 @@ func (p *Request) String() string {
 }
 
 type Msg struct {
-	Status int64  `thrift:"status,1" frugal:"1,default,i64" json:"status"`
-	Code   int64  `thrift:"code,2" frugal:"2,default,i64" json:"code"`
-	Msg    string `thrift:"msg,3" frugal:"3,default,string" json:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewMsg() *Msg {
 	return &Msg{}
 }
 
-func (p *Msg) GetStatus() (v int64) {
-	return p.Status
-}
-
-func (p *Msg) GetCode() (v int64) {
+func (p *Msg) GetCode() (v int32) {
 	return p.Code
 }
 
 func (p *Msg) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *Msg) SetStatus(val int64) {
-	p.Status = val
-}
-func (p *Msg) SetCode(val int64) {
+func (p *Msg) SetCode(val int32) {
 	p.Code = val
 }
 func (p *Msg) SetMsg(val string) {
@@ -173,6 +165,8 @@ type HelloService interface {
 	Echo(ctx context.Context, req *Request) (r *Response, err error)
 
 	Get(ctx context.Context) (r *Response, err error)
+
+	GetByParams(ctx context.Context, data string, msg string) (r *Response, err error)
 
 	GetH(ctx context.Context, id int32) (r *Response, err error)
 
