@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/codec"
-	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/server"
@@ -32,7 +31,7 @@ func main() {
 
 		server.WithCodec(codec.NewDefaultCodecWithSizeLimit(1024*1024*10)),
 
-		server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
+		//server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite|thrift.FastRead|thrift.FastWrite)),
 		//连接多路复用(mux)，GRPC默认多路复用
 		server.WithMuxTransport(),
 		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),

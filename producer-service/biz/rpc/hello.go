@@ -11,26 +11,45 @@ import (
 	"github.com/cloudwego/kitex/pkg/remote"
 	"github.com/cloudwego/kitex/pkg/remote/codec"
 	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
+
+	//"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/transport"
 	trace "github.com/kitex-contrib/tracer-opentracing"
 	api "primus/kitex_gen/hello"
-	helloService "primus/kitex_gen/hello/helloservice"
+	hello "primus/kitex_gen/hello/helloservice"
 	//"primus/pkg/bound"
-	"github.com/kitex-contrib/registry-nacos/resolver"
-	"primus/kitex_gen/hello"
 	cb "primus/pkg/circuitbreak"
 	"primus/pkg/constants"
 	nacosCli "primus/pkg/nacos"
 	"strconv"
+
+	//"github.com/cloudwego/kitex/transport"
+	//"primus/pkg/failure"
+
+	//"github.com/cloudwego/hertz/pkg/network/standard"
+	//"github.com/cloudwego/kitex/pkg/connpool"
+	//"github.com/cloudwego/kitex/pkg/remote/codec"
+	//"github.com/cloudwego/kitex/pkg/remote/trans/netpoll"
+
+	//"github.com/cloudwego/kitex/transport"
+
+	//"github.com/cloudwego/kitex/transport"
+
+	//etcd "github.com/kitex-contrib/registry-etcd"
+	//"github.com/kitex-contrib/registry-nacos/nacos"
+	"github.com/kitex-contrib/registry-nacos/resolver"
+
+	//"github.com/cloudwego/kitex/transport"
 	"time"
 
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/retry"
+	//dns "github.com/kitex-contrib/resolver-dns"
 )
 
-var helloClient helloService.Client
+var helloClient hello.Client
 
 func initHelloRpc() {
 	//r, err := etcd.NewEtcdResolver([]string{constants.EtcdAddress})
@@ -94,7 +113,7 @@ func initHelloRpc() {
 	fp.DisableChainRetryStop()
 
 	// 开启DDL中止
-	//fp.WithDDLStop()
+	fp.WithDDLStop()
 
 	// 退避策略，默认无退避策略
 	fp.WithFixedBackOff(1000)         // 固定时长退避
@@ -108,7 +127,7 @@ func initHelloRpc() {
 	bp := retry.NewBackupPolicy(50)
 	bp.WithMaxRetryTimes(2)
 	// 关闭链路中止
-	//bp.DisableChainRetryStop()
+	bp.DisableChainRetryStop()
 
 	// 开启重试熔断
 	//bp.WithRetryBreaker(float64(1))
@@ -140,7 +159,7 @@ func initHelloRpc() {
 
 	//cbs := circuitbreak.NewCBSuite(circuitbreak.GenServiceCBKeyFunc)
 
-	c, err := helloService.NewClient(
+	c, err := hello.NewClient(
 		constants.HelloServiceName,
 		//client.WithSuite(tracing.NewClientSuite()),
 		// Please keep the same as provider.WithServiceName
@@ -150,8 +169,8 @@ func initHelloRpc() {
 		client.WithMiddleware(cbMW),
 
 		//client.WithDialer(netpoll.NewDialer()),
-		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
-		//client.WithLoadBalancer(lb),
+		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite|thrift.FastRead|thrift.FastWrite)),
+		client.WithLoadBalancer(lb),
 
 		//client.WithTracer(prometheus.NewClientTracer(":9091", "/kitexHelloclient")),
 
@@ -230,9 +249,9 @@ func initHelloRpc() {
 		//这里的连接多路复用是针对于 Thrift 和 Kitex Protobuf，如果配置 gRPC 协议(client.WithTransportProtocol(transport.GRPC))，默认是连接多路复用。
 		//Client 开启连接多路复用，Server 必须也开启，否则会导致请求超时；Server 开启连接多路复用对 Client 没有限制，可以接受短连接、长连接池、连接多路复用的请求。
 		client.WithMuxConnection(2),
-		client.WithConnectTimeout(20*time.Millisecond), //20ms
+		client.WithConnectTimeout(200*time.Millisecond), //20ms
 
-		//client.WithFailureRetry(fp),
+		client.WithFailureRetry(fp),
 		client.WithResolver(r1),
 		//client.WithResolver(dns.NewDNSResolver()),
 		//client.WithBackupRequest(bp),
@@ -240,7 +259,6 @@ func initHelloRpc() {
 		//client.WithMiddleware(failure.NewDelayMW(60 * time.Millisecond)),//毫秒
 		client.WithSuite(trace.NewDefaultClientSuite()),
 		//client.WithBoundHandler(bound.NewCpuLimitHandler()),
-
 	)
 
 	//基于K8s服务发现
@@ -272,15 +290,11 @@ func initHelloRpc() {
 	//c1, err := hello.NewClient(constants.HelloServiceName, client.WithHostPorts("${helloServiceIp}:2008"))//client.WithHostPorts("[::1]:2008"))
 
 	if err != nil {
-		klog.Error(err, lb)
+		klog.Error(err)
 	}
 	helloClient = c
 }
 
-func Echo(ctx context.Context, req *api.Request) (r *hello.Response, err error) {
-	return helloClient.Echo(ctx, req)
-}
-
-func GetH(ctx context.Context, id int32) (r *hello.Response, err error) {
+func GetH(ctx context.Context, id int32) (r *api.Response, err error) {
 	return helloClient.GetH(ctx, id)
 }

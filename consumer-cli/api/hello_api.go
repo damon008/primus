@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GetH(ctx context.Context, c *app.RequestContext)  {
+func GetH(ctx context.Context, c *app.RequestContext) {
 	var q int32 = 100000
 	//cc, _ := nacos.NewNacosConfig("121.37.173.206", 8848)
 	//r := nacoscli.NewNacosResolver(cc)
@@ -25,8 +25,8 @@ func GetH(ctx context.Context, c *app.RequestContext)  {
 		&q,
 		// 在发起调用的时候可指定请求级别的配置
 		//config.
-		config.WithSD(true), // 指定请求级别的设置，用来开启服务发现
-		config.WithReadTimeout(500 * time.Second), // 指定请求读超时
+		config.WithSD(true),                      // 指定请求级别的设置，用来开启服务发现
+		config.WithReadTimeout(2000*time.Second), // 指定请求读超时
 	)
 	if err != nil {
 		hlog.Error(err)
